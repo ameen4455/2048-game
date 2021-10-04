@@ -1,0 +1,30 @@
+.container {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  background-color: green;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.cell {
+  background-color: blue;
+  width: 80px;
+  height: 80px;
+  margin: 10px;
+}
+
+.number {
+  position: absolute;
+  height: 80px;
+  width: 80px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  background-color: #F44336;
+  color: #FFFFFF;
+  transition: all .3s;
+}
