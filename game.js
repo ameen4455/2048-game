@@ -1,13 +1,17 @@
+const WINNING_SCORE = 64;
+
 const game = {
   containerElement: document.getElementsByClassName("container")[0],
   cells: [],
   playable: false,
+  won: false,
   directionRoots: {
     UP: [1, 2, 3, 4],
     RIGHT: [4, 8, 12, 16],
     DOWN: [13, 14, 15, 16],
     LEFT: [1, 5, 9, 13],
   },
+
   init: function () {
     const cellElements = document.getElementsByClassName("cell");
     let cellIndex = 1;
@@ -51,6 +55,61 @@ const game = {
     }
 
     return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  },
+
+  checkMovesInDirection: function (direction) {
+    const roots = this.directionRoots[direction];
+
+    let increment = direction === "RIGHT" || direction === "DOWN" ? -1 : 1;
+
+    increment *= direction === "UP" || direction === "DOWN" ? 4 : 1;
+
+    for (let i = 0; i < roots.length; i++) {
+      const root = roots[i];
+      let adjCellIndex = roots[i];
+      for (let j = 1; j < 4; j++) {
+        const cellIndex = root + j * increment;
+        const cell = this.cells[cellIndex];
+        const adjCell = this.cells[adjCellIndex];
+        if (cell.number && adjCell.number) {
+          if (cell.number.innerText === adjCell.number.innerText) {
+            return true;
+          }
+          adjCellIndex = cellIndex;
+        } else {
+          // Zero exists so possible move in direction
+          return true;
+        }
+      }
+    }
+    return false;
+  },
+
+  checkIfGameLost: function (hasMoved) {
+    if (number.spawn(hasMoved) === false) {
+      let movesInUp = this.checkMovesInDirection("UP");
+      let movesInDown = this.checkMovesInDirection("DOWN");
+      let movesInLeft = this.checkMovesInDirection("LEFT");
+      let movesInRight = this.checkMovesInDirection("RIGHT");
+
+      return !(movesInUp || movesInDown || movesInRight || movesInLeft);
+    }
+
+    return false;
+  },
+
+  checkGameStatus: function (hasMoved) {
+    if (this.won) {
+      alert("Game won!");
+      return;
+    }
+
+    if (this.checkIfGameLost(hasMoved)) {
+      alert("Game lost");
+      return;
+    } else {
+      this.playable = true;
+    }
   },
 
   slide: function (direction) {
@@ -101,43 +160,38 @@ const game = {
 
     this.resetMerged();
 
+    let self = this;
     setTimeout(function () {
-      if (hasMoved) {
-        if (number.spawn()) {
-          game.playable = true;
-        } else {
-          alert("GAME OVER!");
-        }
-      } else {
-        game.playable = true;
-      }
+      self.checkGameStatus(hasMoved);
     }, 500);
   },
 };
 
 const number = {
   numbers: [],
-  spawn: function () {
+  spawn: function (shouldSpawn = true) {
     const emptyCellIndex = game.randomEmptyCellIndex();
 
     if (emptyCellIndex === false) {
       return false;
     }
 
-    const numberElement = document.createElement("div");
+    if (shouldSpawn) {
+      const numberElement = document.createElement("div");
 
-    const numberValue = Math.random() > 0.5 ? 2 : 4;
+      const numberValue = Math.random() > 0.5 ? 2 : 4;
 
-    numberElement.innerText = numberValue;
-    numberElement.dataset.value = false;
-    numberElement.classList.add("number");
+      numberElement.innerText = numberValue;
+      numberElement.dataset.value = false;
+      numberElement.classList.add("number");
 
-    numberElement.style.top = `${game.cells[emptyCellIndex].top}px`;
-    numberElement.style.left = `${game.cells[emptyCellIndex].left}px`;
+      numberElement.style.top = `${game.cells[emptyCellIndex].top}px`;
+      numberElement.style.left = `${game.cells[emptyCellIndex].left}px`;
 
-    game.cells[emptyCellIndex].number = numberElement;
+      game.cells[emptyCellIndex].number = numberElement;
 
-    game.containerElement.append(numberElement);
+      game.containerElement.append(numberElement);
+    }
 
     return true;
   },
@@ -164,6 +218,10 @@ const number = {
       toCell.number.innerText = newNumberValue;
 
       fromCell.number = null;
+
+      if (newNumberValue === WINNING_SCORE) {
+        game.won = true;
+      }
     }
   },
 };
