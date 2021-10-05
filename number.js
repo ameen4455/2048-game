@@ -1,6 +1,6 @@
 import game from "./game.js";
 
-const WINNING_SCORE = 16;
+const WINNING_SCORE = 2048;
 
 const number = {
   // spawn a new tile

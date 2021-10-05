@@ -2,7 +2,9 @@
   width: 400px;
   display: flex;
   flex-direction: column;
-  background-color: green;
+  background-color: #ffcdd2;
+  border-radius: 2px;
+  padding-bottom: 8px;
 }
 
 .row {
@@ -11,19 +13,23 @@
 }
 
 .cell {
-  background-color: blue;
+  background-color: #f06292;
   width: 80px;
   height: 80px;
+  border-radius: 5px;
   margin: 10px;
 }
 
 .number {
+  border-radius: 4px;
   position: absolute;
   height: 80px;
   width: 80px;
   font-size: 24px;
   font-weight: bold;
   text-align: center;
+  margin: auto;
+  line-height: 80px;
   background-color: #f44336;
   color: #ffffff;
   transition: all 0.3s;
