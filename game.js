@@ -1,55 +1,3 @@
-const number = {
-  numbers: [],
-  spawn: function () {
-    const emptyCellIndex = game.randomEmptyCellIndex();
-
-    if (emptyCellIndex === false) {
-      return false;
-    }
-
-    const numberElement = document.createElement("div");
-    const numberValue = 2;
-
-    numberElement.innerText = numberValue;
-    numberElement.dataset.value = false;
-    numberElement.classList.add("number");
-
-    numberElement.style.top = `${game.cells[emptyCellIndex].top}px`;
-    numberElement.style.left = `${game.cells[emptyCellIndex].left}px`;
-
-    game.cells[emptyCellIndex].number = numberElement;
-
-    game.containerElement.append(numberElement);
-
-    return true;
-  },
-
-  moveTo: function (fromCell, toCell) {
-    const number = fromCell.number;
-
-    if (toCell.number === null) {
-      number.style.top = `${toCell.top}px`;
-      number.style.left = `${toCell.left}px`;
-
-      toCell.number = number;
-      fromCell.number = null;
-    } else if (number.innerText === toCell.number.innerText) {
-      number.style.top = `${toCell.top}px`;
-      number.style.left = `${toCell.left}px`;
-
-      setTimeout(() => {
-        game.containerElement.removeChild(number);
-      }, 500);
-
-      const newNumberValue = parseInt(toCell.number.innerText) * 2;
-      toCell.number.dataset.value = true;
-      toCell.number.innerText = newNumberValue;
-
-      fromCell.number = null;
-    }
-  },
-};
-
 const game = {
   containerElement: document.getElementsByClassName("container")[0],
   cells: [],
@@ -77,6 +25,7 @@ const game = {
 
     this.playable = true;
 
+    number.spawn();
     number.spawn();
   },
 
@@ -163,6 +112,59 @@ const game = {
         game.playable = true;
       }
     }, 500);
+  },
+};
+
+const number = {
+  numbers: [],
+  spawn: function () {
+    const emptyCellIndex = game.randomEmptyCellIndex();
+
+    if (emptyCellIndex === false) {
+      return false;
+    }
+
+    const numberElement = document.createElement("div");
+
+    const numberValue = Math.random() > 0.5 ? 2 : 4;
+
+    numberElement.innerText = numberValue;
+    numberElement.dataset.value = false;
+    numberElement.classList.add("number");
+
+    numberElement.style.top = `${game.cells[emptyCellIndex].top}px`;
+    numberElement.style.left = `${game.cells[emptyCellIndex].left}px`;
+
+    game.cells[emptyCellIndex].number = numberElement;
+
+    game.containerElement.append(numberElement);
+
+    return true;
+  },
+
+  moveTo: function (fromCell, toCell) {
+    const number = fromCell.number;
+
+    if (toCell.number === null) {
+      number.style.top = `${toCell.top}px`;
+      number.style.left = `${toCell.left}px`;
+
+      toCell.number = number;
+      fromCell.number = null;
+    } else if (number.innerText === toCell.number.innerText) {
+      number.style.top = `${toCell.top}px`;
+      number.style.left = `${toCell.left}px`;
+
+      setTimeout(() => {
+        game.containerElement.removeChild(number);
+      }, 500);
+
+      const newNumberValue = parseInt(toCell.number.innerText) * 2;
+      toCell.number.dataset.value = true;
+      toCell.number.innerText = newNumberValue;
+
+      fromCell.number = null;
+    }
   },
 };
 
