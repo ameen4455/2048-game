@@ -1,5 +1,6 @@
-const WINNING_SCORE = 16;
+import number from "./number.js";
 
+// An object containing the functionalities of the game
 const game = {
   containerElement: document.getElementsByClassName("container")[0],
   cells: [],
@@ -12,6 +13,7 @@ const game = {
     LEFT: [1, 5, 9, 13],
   },
 
+  // Start the game and initialize spawn 2 tiles
   init: function () {
     const cellElements = document.getElementsByClassName("cell");
     let cellIndex = 1;
@@ -33,6 +35,7 @@ const game = {
     number.spawn();
   },
 
+  // after each action, reset the merged flag to false
   resetMerged: function () {
     game.cells.forEach(function (cell) {
       if (cell.number) {
@@ -41,6 +44,7 @@ const game = {
     });
   },
 
+  // returns an empty index
   randomEmptyCellIndex: function () {
     let emptyCells = [];
 
@@ -57,6 +61,7 @@ const game = {
     return emptyCells[Math.floor(Math.random() * emptyCells.length)];
   },
 
+  // check for possible moves in a given direction
   checkMovesInDirection: function (direction) {
     const roots = this.directionRoots[direction];
 
@@ -64,9 +69,12 @@ const game = {
 
     increment *= direction === "UP" || direction === "DOWN" ? 4 : 1;
 
+    // start checking from further most end for each row/column
     for (let i = 0; i < roots.length; i++) {
       const root = roots[i];
       let adjCellIndex = roots[i];
+
+      // checks if the farthest and the adjacent tile are same
       for (let j = 1; j < 4; j++) {
         const cellIndex = root + j * increment;
         const cell = this.cells[cellIndex];
@@ -77,7 +85,7 @@ const game = {
           }
           adjCellIndex = cellIndex;
         } else {
-          // Zero exists so possible move in direction
+          // zero exists so movement possible
           return true;
         }
       }
@@ -85,6 +93,7 @@ const game = {
     return false;
   },
 
+  // check if a new tile could be spawned or if movement exist any direction
   checkIfGameLost: function (hasMoved) {
     if (number.spawn(hasMoved) === false) {
       let movesInUp = this.checkMovesInDirection("UP");
@@ -98,20 +107,22 @@ const game = {
     return false;
   },
 
+  // check if the game should be further continued
   checkGameStatus: function (hasMoved) {
-    if (this.won) {
+    if (game.won) {
       alert("Game won!");
       return;
     }
 
-    if (this.checkIfGameLost(hasMoved)) {
+    if (game.checkIfGameLost(hasMoved)) {
       alert("Game lost");
       return;
     } else {
-      this.playable = true;
+      game.playable = true;
     }
   },
 
+  // slide tile in the given direction
   slide: function (direction) {
     if (!this.playable) {
       return false;
@@ -135,15 +146,15 @@ const game = {
         if (cell.number !== null) {
           let moveToCell = null;
           for (let k = j - 1; k >= 0; k--) {
-            const foreCellIndex = root + k * increment;
-            const foreCell = this.cells[foreCellIndex];
+            const toCellIndex = root + k * increment;
+            const toCell = this.cells[toCellIndex];
 
-            if (foreCell.number === null) {
-              moveToCell = foreCell;
-            } else if (foreCell.number.dataset.value === true) {
+            if (toCell.number === null) {
+              moveToCell = toCell;
+            } else if (toCell.number.dataset.value === true) {
               break;
-            } else if (cell.number.innerText === foreCell.number.innerText) {
-              moveToCell = foreCell;
+            } else if (cell.number.innerText === toCell.number.innerText) {
+              moveToCell = toCell;
               break;
             } else {
               break;
@@ -165,72 +176,13 @@ const game = {
     }, 500);
   },
 
+  // resets the game
   reset: function () {
     document.querySelectorAll(".number").forEach((e) => e.remove());
-    number.numbers = [];
     game.cells = [];
     game.playable = false;
     game.won = false;
-    game.init()
-  },
-};
-
-const number = {
-  numbers: [],
-  spawn: function (shouldSpawn = true) {
-    const emptyCellIndex = game.randomEmptyCellIndex();
-
-    if (emptyCellIndex === false) {
-      return false;
-    }
-
-    if (shouldSpawn) {
-      const numberElement = document.createElement("div");
-
-      const numberValue = Math.random() > 0.5 ? 2 : 4;
-
-      numberElement.innerText = numberValue;
-      numberElement.dataset.value = false;
-      numberElement.classList.add("number");
-
-      numberElement.style.top = `${game.cells[emptyCellIndex].top}px`;
-      numberElement.style.left = `${game.cells[emptyCellIndex].left}px`;
-
-      game.cells[emptyCellIndex].number = numberElement;
-
-      game.containerElement.append(numberElement);
-    }
-
-    return true;
-  },
-
-  moveTo: function (fromCell, toCell) {
-    const number = fromCell.number;
-
-    if (toCell.number === null) {
-      number.style.top = `${toCell.top}px`;
-      number.style.left = `${toCell.left}px`;
-
-      toCell.number = number;
-      fromCell.number = null;
-    } else if (number.innerText === toCell.number.innerText) {
-      number.style.top = `${toCell.top}px`;
-      number.style.left = `${toCell.left}px`;
-
-      setTimeout(function () {
-        game.containerElement.removeChild(number);
-      }, 500);
-
-      const newNumberValue = parseInt(toCell.number.innerText) * 2;
-      toCell.number.dataset.value = true;
-      toCell.number.innerText = newNumberValue;
-
-      fromCell.number = null;
-
-      if (newNumberValue === WINNING_SCORE) {
-        game.won = true;
-      }
-    }
+    game.init();
   },
 };
 
