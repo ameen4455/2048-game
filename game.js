@@ -11,7 +11,7 @@ const number = {
     const numberValue = 2;
 
     numberElement.innerText = numberValue;
-    numberElement.dataset.value = numberValue;
+    numberElement.dataset.value = false;
     numberElement.classList.add("number");
 
     numberElement.style.top = `${game.cells[emptyCellIndex].top}px`;
@@ -33,7 +33,7 @@ const number = {
 
       toCell.number = number;
       fromCell.number = null;
-    } else if (number.dataset.value === toCell.number.dataset.value) {
+    } else if (number.innerText === toCell.number.innerText) {
       number.style.top = `${toCell.top}px`;
       number.style.left = `${toCell.left}px`;
 
@@ -41,8 +41,8 @@ const number = {
         game.containerElement.removeChild(number);
       }, 500);
 
-      const newNumberValue = toCell.number.dataset.value * 2;
-      toCell.number.dataset.value = newNumberValue;
+      const newNumberValue = parseInt(toCell.number.innerText) * 2;
+      toCell.number.dataset.value = true;
       toCell.number.innerText = newNumberValue;
 
       fromCell.number = null;
@@ -80,6 +80,14 @@ const game = {
     number.spawn();
   },
 
+  resetMerged: function () {
+    game.cells.forEach(function (cell) {
+      if (cell.number) {
+        cell.number.dataset.value = false;
+      }
+    });
+  },
+
   randomEmptyCellIndex: function () {
     let emptyCells = [];
 
@@ -108,6 +116,8 @@ const game = {
 
     increment *= direction === "UP" || direction === "DOWN" ? 4 : 1;
 
+    let hasMoved = false;
+
     for (let i = 0; i < roots.length; i++) {
       const root = roots[i];
       for (let j = 1; j < 4; j++) {
@@ -122,9 +132,9 @@ const game = {
 
             if (foreCell.number === null) {
               moveToCell = foreCell;
-            } else if (
-              cell.number.dataset.value === foreCell.number.dataset.value
-            ) {
+            } else if (foreCell.number.dataset.value === true) {
+              break;
+            } else if (cell.number.innerText === foreCell.number.innerText) {
               moveToCell = foreCell;
               break;
             } else {
@@ -134,16 +144,23 @@ const game = {
 
           if (moveToCell !== null) {
             number.moveTo(cell, moveToCell);
+            hasMoved = true;
           }
         }
       }
     }
 
+    this.resetMerged();
+
     setTimeout(function () {
-      if (number.spawn()) {
-        game.playable = true;
+      if (hasMoved) {
+        if (number.spawn()) {
+          game.playable = true;
+        } else {
+          alert("GAME OVER!");
+        }
       } else {
-        alert("GAME OVER!");
+        game.playable = true;
       }
     }, 500);
   },
