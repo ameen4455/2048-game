@@ -1,4 +1,4 @@
-const WINNING_SCORE = 64;
+const WINNING_SCORE = 16;
 
 const game = {
   containerElement: document.getElementsByClassName("container")[0],
@@ -160,10 +160,18 @@ const game = {
 
     this.resetMerged();
 
-    let self = this;
     setTimeout(function () {
-      self.checkGameStatus(hasMoved);
+      game.checkGameStatus(hasMoved);
     }, 500);
+  },
+
+  reset: function () {
+    document.querySelectorAll(".number").forEach((e) => e.remove());
+    number.numbers = [];
+    game.cells = [];
+    game.playable = false;
+    game.won = false;
+    game.init()
   },
 };
 
@@ -209,7 +217,7 @@ const number = {
       number.style.top = `${toCell.top}px`;
       number.style.left = `${toCell.left}px`;
 
-      setTimeout(() => {
+      setTimeout(function () {
         game.containerElement.removeChild(number);
       }, 500);
 

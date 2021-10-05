@@ -24,7 +24,12 @@
   font-size: 24px;
   font-weight: bold;
   text-align: center;
-  background-color: #F44336;
-  color: #FFFFFF;
-  transition: all .3s;
+  background-color: #f44336;
+  color: #ffffff;
+  transition: all 0.3s;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
 }
